@@ -13,8 +13,6 @@ class GridEnv:
         self.state = self.start
         # エージェントの行動
         self.action_space = 4  # 0:上, 1:右, 2:下, 3:左
-        # 観測環境
-        self.observation_space = size * size
 
     # 環境をリセットさせる
     def reset(self):
@@ -41,6 +39,8 @@ class GridEnv:
 
         done = False
         reward = 0.0
+        # 探索コスト
+        reward-= 0.5
 
         # 穴に落ちたら終了
         if self.state in self.holes:
@@ -51,7 +51,6 @@ class GridEnv:
             done = True
             reward += 5.0
 
-        reward-= 0.5
 
         return self._state_to_index(self.state), reward, done
 
