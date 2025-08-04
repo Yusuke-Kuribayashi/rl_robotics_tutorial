@@ -26,7 +26,7 @@ class Arm1DEnv:
         self.state = (self.start, self.goal)
         return self.state
 
-    def step(self, action):  # actionは0~8（±1調整のペア）
+    def step(self, action):
         x, y = self.state
 
         # 正方向に+5°
