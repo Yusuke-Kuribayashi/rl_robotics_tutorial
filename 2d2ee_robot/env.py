@@ -77,6 +77,3 @@ class Arm2DEnv:
         x = self.link_length*np.cos(theta1) + self.link_length*np.cos(theta1+theta2)
         y = self.link_length*np.sin(theta1) + self.link_length*np.sin(theta1+theta2)
         return np.array([x, y])
-
-    # # 可視化（任意）
-    # def render(self):        
