@@ -31,7 +31,7 @@ class Arm2DEnv:
         goal_theta = np.random.uniform(-90, 90, size=2)
         self.goal = self.fk(goal_theta)
         self.state = np.array([self.start, self.goal])
-        return self.state
+        return self.get_state()
     
     # 行動に基づいて状態更新・報酬計算
     def step(self, action):
@@ -46,16 +46,16 @@ class Arm2DEnv:
         done = False
         reward = 0.0
         hand_position = self.fk(joint_angles)
-        distance = np.linalg.norm(goal_position-hand_position)
+        distance = np.linalg.norm(goal_position-hand_position)*0.5
         # 報酬
         # 距離ペナルティ
         reward -= distance
         # 探索ペナルティ
-        reward -= 0.1
+        reward -= 0.01
 
         if distance < self.tol:
             done = True
-            reward += 5.0
+            reward += 30.0
 
         return self.get_state(), reward, done
 
@@ -77,3 +77,25 @@ class Arm2DEnv:
         x = self.link_length*np.cos(theta1) + self.link_length*np.cos(theta1+theta2)
         y = self.link_length*np.sin(theta1) + self.link_length*np.sin(theta1+theta2)
         return np.array([x, y])
+    
+    def step_sim(self, action):
+        joint_angles, goal_position = self.state.copy()
+
+        # 行動による状態の変化
+        joint_angles = (joint_angles +  np.array(self.action_space[action])) % 360
+
+        # 状態を更新
+        self.state = np.array([joint_angles, goal_position])
+
+        done = False
+        hand_position = self.fk(joint_angles)
+        distance = np.linalg.norm(goal_position-hand_position)
+        if distance < self.tol:
+            done = True
+
+        # 関節座標を返す
+        x = self.link_length * np.cos(np.deg2rad(joint_angles[0]))
+        y = self.link_length * np.sin(np.deg2rad(joint_angles[0]))
+        elbow_xy = (x, y)
+
+        return hand_position, elbow_xy, done
